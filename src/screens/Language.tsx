@@ -1,11 +1,19 @@
 // src/screens/Home.tsx
-import React from 'react';
+import React, {useCallback} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import TopNavigation from '../navigation/TabNavigation';
 import SongCard from '../components/SongCard';
 import SurfaceLayout from '../layouts/SurfaceLayout';
+import {useFocusEffect} from '@react-navigation/native';
+import {useGlobalContext} from '../utils/isAuthenticated';
 
-const Language: React.FC = ({...props}) => {
+const Language: React.FC = ({...props}: any) => {
+  const {setcurrentRoute} = useGlobalContext();
+  useFocusEffect(
+    useCallback(() => {
+      setcurrentRoute('Language');
+    }, []),
+  );
   return (
     <SurfaceLayout>
       <ScrollView contentContainerStyle={styles.container}>

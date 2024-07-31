@@ -1,11 +1,12 @@
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 import React from 'react';
+import EntypoIcon from 'react-native-vector-icons/Entypo';
 
 // type Props = {
 //   variant: string;
 // };
 
-const SongCard = ({props, onPress}: any) => {
+const SongCard = ({props, onPress, isPinned}: any) => {
   const styles = StyleSheet.create({
     cardShadow: {
       borderRadius: 16,
@@ -49,6 +50,11 @@ const SongCard = ({props, onPress}: any) => {
       flexDirection: 'row',
       width: '100%',
     },
+    pin: {
+      position: 'absolute',
+      right: 10,
+      top: 15,
+    },
   });
   return (
     <Pressable
@@ -56,6 +62,15 @@ const SongCard = ({props, onPress}: any) => {
       style={{width: props.variant == 'Index' ? 80 : '100%'}}>
       <View style={styles.cardShadow}>
         <View style={styles.container}>
+          {isPinned && (
+            <EntypoIcon
+              size={20}
+              name="pin"
+              color="#3683AF"
+              style={styles.pin}
+            />
+          )}
+
           {props.s_no ? (
             <Text style={styles.title}>
               {props.s_no} . {props.name}

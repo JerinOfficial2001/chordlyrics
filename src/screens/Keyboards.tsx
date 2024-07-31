@@ -1,11 +1,19 @@
 import {View, Text, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {useCallback} from 'react';
 import SongCard from '../components/SongCard';
 import SurfaceLayout from '../layouts/SurfaceLayout';
+import {useGlobalContext} from '../utils/isAuthenticated';
+import {useFocusEffect} from '@react-navigation/native';
 
 type Props = {};
 
 const Keyboards = ({props}: any) => {
+  const {setcurrentRoute} = useGlobalContext();
+  useFocusEffect(
+    useCallback(() => {
+      setcurrentRoute('Keyboards');
+    }, []),
+  );
   return (
     <SurfaceLayout>
       <View style={styles.container}>

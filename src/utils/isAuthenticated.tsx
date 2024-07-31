@@ -10,6 +10,7 @@ export const useGlobalContext = () => {
 const AuthContextAPI = ({children}: any) => {
   const [cachedData, setcachedData] = useState<any>(null);
   const [showFloatButton, setshowFloatButton] = useState(true);
+  const [currentRoute, setcurrentRoute] = useState('');
   AsyncStorage.getItem('chordlyrics_cookies').then((res: any) =>
     setcachedData(res ? JSON.parse(res) : false),
   );
@@ -22,6 +23,8 @@ const AuthContextAPI = ({children}: any) => {
         setcachedData,
         showFloatButton,
         setshowFloatButton,
+        currentRoute,
+        setcurrentRoute,
       }}>
       {children}
     </AuthContext.Provider>

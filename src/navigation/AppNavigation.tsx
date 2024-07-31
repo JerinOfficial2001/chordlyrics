@@ -18,6 +18,7 @@ import {TouchableOpacity, StyleSheet} from 'react-native';
 import Auth from '../screens/Auth';
 import {useGlobalContext} from '../utils/isAuthenticated';
 import AddDataModal from '../components/Modals/AddDataModal';
+import AddSong from '../screens/AddSong';
 
 type RootStackParamList = {
   Home: undefined;
@@ -26,13 +27,15 @@ type RootStackParamList = {
   Songs: undefined;
   ViewSong: undefined;
   Auth: undefined;
+  AddSong: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
   const [isOpen, setisOpen] = useState(false);
-  const {showFloatButton} = useGlobalContext();
+  const {showFloatButton, currentRoute, isAuthenticated} = useGlobalContext();
+
   const styles = StyleSheet.create({
     FloatableButton: {
       borderRadius: 50,
@@ -109,15 +112,26 @@ const AppNavigator: React.FC = () => {
           }}
           component={Auth}
         />
+        <Stack.Screen
+          name="AddSong"
+          options={{
+            title: 'Add Lyrics',
+          }}
+          component={AddSong}
+        />
       </Stack.Navigator>
-      {showFloatButton && (
+      {showFloatButton && isAuthenticated && (
         <TouchableOpacity
           onPress={() => setisOpen(true)}
           style={styles.FloatableButton}>
           <EntypoIcon size={26} name="plus" color="#3683AF" />
         </TouchableOpacity>
       )}
-      <AddDataModal isVisible={isOpen} handleDismiss={handleClose} />
+      <AddDataModal
+        name={currentRoute}
+        isVisible={isOpen}
+        handleDismiss={handleClose}
+      />
     </NavigationContainer>
   );
 };

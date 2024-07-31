@@ -1,10 +1,26 @@
 // src/screens/Songs.tsx
-import React, {useEffect} from 'react';
-import {View, Text, StyleSheet, FlatList, ScrollView} from 'react-native';
-import TopNavigation from '../navigation/TabNavigation';
-import SongCard from '../components/SongCard';
+import React, {useEffect, useCallback, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import SurfaceLayout from '../layouts/SurfaceLayout';
+import {useGlobalContext} from '../utils/isAuthenticated';
+import {useFocusEffect} from '@react-navigation/native';
+import EntypoIcon from 'react-native-vector-icons/Entypo';
+
 const ViewSong: React.FC<any> = ({navigation, ...props}) => {
+  const {setshowFloatButton, showFloatButton} = useGlobalContext();
+  const [isPinned, setisPinned] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      setshowFloatButton(false);
+    }, [showFloatButton]),
+  );
   const songData = {
     title: 'தடைகளை உடைப்பவரே',
     lyrics: `Gm               Gm                 F
@@ -61,12 +77,29 @@ Dm            Cm                     F                   Gm
     tempo: '120',
     style: '123 (Disco)',
     beat: '3/4',
+    status: 'completed',
+    isPinned: false,
   };
   useEffect(() => {
     navigation.setOptions({
       title: songData.title,
+      headerRight: () => (
+        <TouchableOpacity onPress={handlePinSong} style={{marginRight: 10}}>
+          <EntypoIcon
+            size={20}
+            name="pin"
+            color={isPinned ? '#3683AF' : 'gray'}
+          />
+        </TouchableOpacity>
+      ),
     });
-  }, []);
+    if (songData.isPinned) {
+      setisPinned(true);
+    }
+  }, [isPinned]);
+  const handlePinSong = () => {
+    setisPinned(!isPinned);
+  };
   return (
     <SurfaceLayout>
       <View style={styles.container}>

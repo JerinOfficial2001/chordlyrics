@@ -1,13 +1,21 @@
 // src/screens/Home.tsx
-import React from 'react';
+import React, {useCallback} from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
 import TopNavigation from '../navigation/TabNavigation';
 import SongCard from '../components/SongCard';
 import SurfaceLayout from '../layouts/SurfaceLayout';
+import {useGlobalContext} from '../utils/isAuthenticated';
+import {useFocusEffect} from '@react-navigation/native';
 interface SongIndexProps {
   props: any;
 }
 const SongIndex = ({...props}) => {
+  const {setcurrentRoute} = useGlobalContext();
+  useFocusEffect(
+    useCallback(() => {
+      setcurrentRoute('SongIndex');
+    }, []),
+  );
   return (
     <SurfaceLayout>
       <View style={styles.container}>

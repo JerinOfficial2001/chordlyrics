@@ -6,6 +6,7 @@ import {useGlobalContext} from '../utils/isAuthenticated';
 import {useFocusEffect} from '@react-navigation/native';
 import TextField from '../components/TextField';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
+import ButtonComponent from '../components/ButtonComponent';
 
 type Props = {};
 
@@ -56,12 +57,7 @@ const Auth = (props: Props) => {
           }
         />
 
-        <Button
-          mode="contained"
-          textColor="#3683AF"
-          contentStyle={styles.button}>
-          Submit
-        </Button>
+        <ButtonComponent name="Submit" />
       </View>
     </SurfaceLayout>
   );
