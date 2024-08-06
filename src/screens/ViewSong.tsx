@@ -12,8 +12,12 @@ import SurfaceLayout from '../layouts/SurfaceLayout';
 import {useGlobalContext} from '../utils/isAuthenticated';
 import {useFocusEffect} from '@react-navigation/native';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
+import {useQuery} from '@tanstack/react-query';
+import {getLyrics} from '../controllers/songs';
 
-const ViewSong: React.FC<any> = ({navigation, ...props}) => {
+const ViewSong: React.FC<any> = ({navigation, route, ...props}) => {
+  const {id} = route.params;
+
   const {setshowFloatButton, showFloatButton} = useGlobalContext();
   const [isPinned, setisPinned] = useState(false);
   useFocusEffect(
@@ -21,68 +25,74 @@ const ViewSong: React.FC<any> = ({navigation, ...props}) => {
       setshowFloatButton(false);
     }, [showFloatButton]),
   );
-  const songData = {
-    title: 'தடைகளை உடைப்பவரே',
-    lyrics: `Gm               Gm                 F
-தடைகளை உடைப்பவரே 
-F                                            Gm
-எனக்கு முன் செல்கின்றீரே – 2
+  const {data: songData} = useQuery({
+    queryKey: ['SongLyrics', id],
+    queryFn: getLyrics,
+  });
+  console.log(JSON.stringify(songData, null, 2));
 
-Eb                                                  F
-நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-Dm            Cm                     F                   Gm
-கரடானவைகளைச் சமமாக்குவீர்
-Eb                               F
-நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-Dm            Cm                     F                   Gm
-மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
-Gm               Gm                 F
-தடைகளை உடைப்பவரே 
-F                                            Gm
-எனக்கு முன் செல்கின்றீரே – 2 
-Eb                                                  F
-நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-Dm            Cm                     F                   Gm
-கரடானவைகளைச் சமமாக்குவீர்
-Eb                               F
-நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-Dm            Cm                     F                   Gm
-மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
-Gm               Gm                 F
-தடைகளை உடைப்பவரே 
-F                                            Gm
-எனக்கு முன் செல்கின்றீரே – 2 
-Eb                                                  F
-நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-Dm            Cm                     F                   Gm
-கரடானவைகளைச் சமமாக்குவீர்
-Eb                               F
-நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-Dm            Cm                     F                   Gm
-மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
-Gm               Gm                 F
-தடைகளை உடைப்பவரே 
-F                                            Gm
-எனக்கு முன் செல்கின்றீரே – 2 
-Eb                                                  F
-நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-Dm            Cm                     F                   Gm
-கரடானவைகளைச் சமமாக்குவீர்
-Eb                               F
-நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-Dm            Cm                     F                   Gm
-மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2`,
-    _id: '1',
-    scale: 'G',
-    tempo: '120',
-    style: '123 (Disco)',
-    beat: '3/4',
-    status: 'completed',
-    isPinned: false,
-  };
+  //   const songData = {
+  //     title: 'தடைகளை உடைப்பவரே',
+  //     lyrics: `Gm               Gm                 F
+  // தடைகளை உடைப்பவரே
+  // F                                            Gm
+  // எனக்கு முன் செல்கின்றீரே – 2
+
+  // Eb                                                  F
+  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
+  // Dm            Cm                     F                   Gm
+  // கரடானவைகளைச் சமமாக்குவீர்
+  // Eb                               F
+  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
+  // Dm            Cm                     F                   Gm
+  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
+  // Gm               Gm                 F
+  // தடைகளை உடைப்பவரே
+  // F                                            Gm
+  // எனக்கு முன் செல்கின்றீரே – 2
+  // Eb                                                  F
+  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
+  // Dm            Cm                     F                   Gm
+  // கரடானவைகளைச் சமமாக்குவீர்
+  // Eb                               F
+  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
+  // Dm            Cm                     F                   Gm
+  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
+  // Gm               Gm                 F
+  // தடைகளை உடைப்பவரே
+  // F                                            Gm
+  // எனக்கு முன் செல்கின்றீரே – 2
+  // Eb                                                  F
+  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
+  // Dm            Cm                     F                   Gm
+  // கரடானவைகளைச் சமமாக்குவீர்
+  // Eb                               F
+  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
+  // Dm            Cm                     F                   Gm
+  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
+  // Gm               Gm                 F
+  // தடைகளை உடைப்பவரே
+  // F                                            Gm
+  // எனக்கு முன் செல்கின்றீரே – 2
+  // Eb                                                  F
+  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
+  // Dm            Cm                     F                   Gm
+  // கரடானவைகளைச் சமமாக்குவீர்
+  // Eb                               F
+  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
+  // Dm            Cm                     F                   Gm
+  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2`,
+  //     _id: '1',
+  //     scale: 'G',
+  //     tempo: '120',
+  //     style: '123 (Disco)',
+  //     beat: '3/4',
+  //     status: 'completed',
+  //     isPinned: false,
+  //   };
   useEffect(() => {
     navigation.setOptions({
-      title: songData.title,
+      title: songData?.title,
       headerRight: () => (
         <TouchableOpacity onPress={handlePinSong} style={{marginRight: 10}}>
           <EntypoIcon
@@ -93,10 +103,10 @@ Dm            Cm                     F                   Gm
         </TouchableOpacity>
       ),
     });
-    if (songData.isPinned) {
+    if (songData?.isPinned) {
       setisPinned(true);
     }
-  }, [isPinned]);
+  }, [isPinned, songData]);
   const handlePinSong = () => {
     setisPinned(!isPinned);
   };
@@ -104,13 +114,20 @@ Dm            Cm                     F                   Gm
     <SurfaceLayout>
       <View style={styles.container}>
         <View style={styles.subtitleContainer}>
-          <Text style={styles.subtitle}>{songData.scale} </Text>
-          <Text style={styles.subtitle}>{songData.beat} </Text>
-          <Text style={styles.subtitle}>R-{songData.style} </Text>
-          <Text style={styles.subtitle}>T-{songData.tempo} </Text>
+          <Text style={styles.subtitle}>{songData?.scale} </Text>
+          <Text style={styles.subtitle}>{songData?.beat} </Text>
+          <Text style={styles.subtitle}>R-{songData?.style} </Text>
+          <Text style={styles.subtitle}>T-{songData?.tempo} </Text>
         </View>
-        <ScrollView>
-          <Text style={{color: '#3683AF'}}>{songData.lyrics}</Text>
+        <ScrollView contentContainerStyle={{}}>
+          <Text
+            style={{
+              color: '#3683AF',
+              fontSize: 20,
+              textAlign: 'justify',
+            }}>
+            {songData?.lyrics}
+          </Text>
         </ScrollView>
       </View>
     </SurfaceLayout>

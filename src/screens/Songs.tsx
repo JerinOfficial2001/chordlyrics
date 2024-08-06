@@ -6,39 +6,31 @@ import SongCard from '../components/SongCard';
 import SurfaceLayout from '../layouts/SurfaceLayout';
 import {useFocusEffect} from '@react-navigation/native';
 import {useGlobalContext} from '../utils/isAuthenticated';
+import {getTitles} from '../controllers/songs';
+import {useQuery} from '@tanstack/react-query';
+
 interface SongsProps {
   props: any;
+  routes: any;
 }
-const Songs = ({...props}) => {
+const Songs = ({route, ...props}: any) => {
+  const {index} = route.params;
+
   const {setcurrentRoute} = useGlobalContext();
   useFocusEffect(
     useCallback(() => {
       setcurrentRoute('Songs');
     }, []),
   );
+  const {data: SongTitles} = useQuery({
+    queryKey: ['SongIndexs', index],
+    queryFn: getTitles,
+  });
+
   return (
     <SurfaceLayout>
       <FlatList
-        data={[
-          {
-            title: 'God is Good',
-            scale: 'G',
-            tempo: '120',
-            style: '123 (Disco)',
-            beat: '2/4',
-            _id: '1',
-            isPinned: true,
-          },
-          {
-            title: 'Bless up be the name of the lord',
-            scale: 'G',
-            tempo: '120',
-            style: '123 (Disco)',
-            beat: '3/4',
-            _id: '2',
-            isPinned: false,
-          },
-        ]}
+        data={SongTitles}
         keyExtractor={key => key._id}
         renderItem={({item, index}) => {
           return (

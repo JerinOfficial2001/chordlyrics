@@ -172,7 +172,7 @@ const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
                 );
               } else if (elem.type == 'choose') {
                 return (
-                  <View style={styles.chipContainer}>
+                  <View key={index} style={styles.chipContainer}>
                     <Text style={styles.chipHeader}>{elem.label}</Text>
                     <View style={styles.chipInput}>
                       {Beats.map((beat, beat_index) => {
