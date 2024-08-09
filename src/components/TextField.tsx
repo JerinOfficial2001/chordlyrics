@@ -1,6 +1,6 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
-import {TextInput} from 'react-native-paper';
+import {TextInput, useTheme} from 'react-native-paper';
 
 type Props = {
   label: string;
@@ -29,8 +29,10 @@ const TextField = ({
   const styles = StyleSheet.create({
     inputField: {
       width: width ? width : '100%',
+      backgroundColor: 'white',
     },
   });
+  const theme = useTheme();
   return (
     <TextInput
       multiline={isBigInput}
@@ -42,8 +44,9 @@ const TextField = ({
       outlineStyle={{
         borderColor: '#C3E0F0',
       }}
+      textColor="black"
       theme={{
-        colors: {primary: '#3683AF'},
+        colors: {primary: '#3683AF', placeholder: '#C3E0F0'},
       }}
       mode="outlined"
       style={[
@@ -52,6 +55,7 @@ const TextField = ({
       ]}
       right={<TextInput.Icon icon={() => Icon} />}
       placeholder={placeholder}
+      placeholderTextColor={'#9796968a'}
     />
   );
 };

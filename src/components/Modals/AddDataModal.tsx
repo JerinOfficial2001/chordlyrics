@@ -59,6 +59,7 @@ const AddDataModal = ({
       onChange: (value: any) => handleOnchange('title', value),
       type: 'text',
       keyboardtype: 'default',
+      placeholder: 'type title here',
     },
 
     {
@@ -68,6 +69,7 @@ const AddDataModal = ({
       onChange: (value: any) => handleOnchange('keyboardModal', value),
       type: 'text',
       keyboardtype: 'default',
+      placeholder: 'eg:Yamaha i455',
     },
     {
       name: 'language',
@@ -76,6 +78,7 @@ const AddDataModal = ({
       onChange: (value: any) => handleOnchange('language', value),
       type: 'text',
       keyboardtype: 'default',
+      placeholder: 'eg:Tamil',
     },
     {
       name: 'style',
@@ -84,6 +87,7 @@ const AddDataModal = ({
       onChange: (value: any) => handleOnchange('style', value),
       type: 'text',
       keyboardtype: 'default',
+      placeholder: 'eg:Disco or index',
     },
     {
       name: 'scale',
@@ -92,6 +96,7 @@ const AddDataModal = ({
       onChange: (value: any) => handleOnchange('scale', value),
       type: 'merge',
       keyboardtype: 'default',
+      placeholder: 'eg:D',
     },
     {
       name: 'tempo',
@@ -100,6 +105,7 @@ const AddDataModal = ({
       onChange: (value: any) => handleOnchange('tempo', value),
       type: 'merge',
       keyboardtype: 'number-pad',
+      placeholder: 'eg:120',
     },
 
     {
@@ -109,6 +115,7 @@ const AddDataModal = ({
       onChange: (value: any) => handleOnchange('beat', value),
       type: 'choose',
       keyboardtype: 'default',
+      placeholder: '',
     },
   ];
 
@@ -199,6 +206,7 @@ const AddDataModal = ({
                     value={elem.value}
                     type={elem.keyboardtype}
                     width={'48.5%'}
+                    placeholder={elem.placeholder}
                   />
                 );
               } else if (elem.type == 'choose') {
@@ -240,6 +248,7 @@ const AddDataModal = ({
                     onChange={elem.onChange}
                     value={elem.value}
                     type={elem.keyboardtype}
+                    placeholder={elem.placeholder}
                   />
                 );
               }
