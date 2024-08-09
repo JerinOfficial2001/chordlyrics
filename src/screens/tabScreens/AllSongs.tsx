@@ -1,40 +1,41 @@
-// src/screens/Songs.tsx
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import React, {useCallback} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
-import TopNavigation from '../navigation/TabNavigation';
-import SongCard from '../components/SongCard';
-import SurfaceLayout from '../layouts/SurfaceLayout';
+import SurfaceLayout from '../../layouts/SurfaceLayout';
+import {useGlobalContext} from '../../utils/isAuthenticated';
 import {useFocusEffect} from '@react-navigation/native';
-import {useGlobalContext} from '../utils/isAuthenticated';
-import {getTitles} from '../controllers/songs';
 import {useQuery} from '@tanstack/react-query';
-import Loader from '../components/Loader';
+import Loader from '../../components/Loader';
+import SongCard from '../../components/SongCard';
+import {getAllSongs} from '../../controllers/songs';
 
-interface SongsProps {
-  props: any;
-  routes: any;
-}
-const Songs = ({route, ...props}: any) => {
-  const {index} = route.params;
+type Props = {};
 
+const AllSongs = ({props}: any) => {
   const {setcurrentRoute, cachedData} = useGlobalContext();
+  const {
+    data: AllSongs,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['AllSongs'],
+    queryFn: getAllSongs,
+  });
+
   useFocusEffect(
     useCallback(() => {
       setcurrentRoute('Songs');
+
+      refetch();
     }, []),
   );
-  const {data: SongTitles, isLoading} = useQuery({
-    queryKey: ['SongIndexs', index],
-    queryFn: getTitles,
-  });
 
   return (
     <SurfaceLayout>
       {isLoading ? (
         <Loader />
-      ) : (
+      ) : AllSongs.length > 0 ? (
         <FlatList
-          data={SongTitles}
+          data={AllSongs}
           keyExtractor={key => key._id}
           renderItem={({item, index}) => {
             return (
@@ -63,11 +64,12 @@ const Songs = ({route, ...props}: any) => {
           }}
           contentContainerStyle={styles.container}
         />
+      ) : (
+        <Loader empty={true} />
       )}
     </SurfaceLayout>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     padding: 10,
@@ -75,5 +77,4 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 });
-
-export default Songs;
+export default AllSongs;

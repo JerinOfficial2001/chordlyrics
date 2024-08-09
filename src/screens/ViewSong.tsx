@@ -12,11 +12,14 @@ import SurfaceLayout from '../layouts/SurfaceLayout';
 import {useGlobalContext} from '../utils/isAuthenticated';
 import {useFocusEffect} from '@react-navigation/native';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useQuery} from '@tanstack/react-query';
 import {getLyrics} from '../controllers/songs';
+import Loader from '../components/Loader';
+import {isPinnedOffline, pinSongsOffline} from '../controllers/pinSongs';
 
 const ViewSong: React.FC<any> = ({navigation, route, ...props}) => {
-  const {id} = route.params;
+  const {id, mySong} = route.params;
 
   const {setshowFloatButton, showFloatButton} = useGlobalContext();
   const [isPinned, setisPinned] = useState(false);
@@ -25,111 +28,84 @@ const ViewSong: React.FC<any> = ({navigation, route, ...props}) => {
       setshowFloatButton(false);
     }, [showFloatButton]),
   );
-  const {data: songData} = useQuery({
+  const {data: songData, isLoading} = useQuery({
     queryKey: ['SongLyrics', id],
     queryFn: getLyrics,
   });
-  console.log(JSON.stringify(songData, null, 2));
-
-  //   const songData = {
-  //     title: 'தடைகளை உடைப்பவரே',
-  //     lyrics: `Gm               Gm                 F
-  // தடைகளை உடைப்பவரே
-  // F                                            Gm
-  // எனக்கு முன் செல்கின்றீரே – 2
-
-  // Eb                                                  F
-  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-  // Dm            Cm                     F                   Gm
-  // கரடானவைகளைச் சமமாக்குவீர்
-  // Eb                               F
-  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-  // Dm            Cm                     F                   Gm
-  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
-  // Gm               Gm                 F
-  // தடைகளை உடைப்பவரே
-  // F                                            Gm
-  // எனக்கு முன் செல்கின்றீரே – 2
-  // Eb                                                  F
-  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-  // Dm            Cm                     F                   Gm
-  // கரடானவைகளைச் சமமாக்குவீர்
-  // Eb                               F
-  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-  // Dm            Cm                     F                   Gm
-  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
-  // Gm               Gm                 F
-  // தடைகளை உடைப்பவரே
-  // F                                            Gm
-  // எனக்கு முன் செல்கின்றீரே – 2
-  // Eb                                                  F
-  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-  // Dm            Cm                     F                   Gm
-  // கரடானவைகளைச் சமமாக்குவீர்
-  // Eb                               F
-  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-  // Dm            Cm                     F                   Gm
-  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2
-  // Gm               Gm                 F
-  // தடைகளை உடைப்பவரே
-  // F                                            Gm
-  // எனக்கு முன் செல்கின்றீரே – 2
-  // Eb                                                  F
-  // நீர் கோணலானவைகளைச் செவ்வையாக்குவீர்
-  // Dm            Cm                     F                   Gm
-  // கரடானவைகளைச் சமமாக்குவீர்
-  // Eb                               F
-  // நீர் வெண்கல கதவுகள் உடைத்தெறிவீர்
-  // Dm            Cm                     F                   Gm
-  // மறைத்த பொக்கிஷங்களை வெளித்தருவீர் – 2`,
-  //     _id: '1',
-  //     scale: 'G',
-  //     tempo: '120',
-  //     style: '123 (Disco)',
-  //     beat: '3/4',
-  //     status: 'completed',
-  //     isPinned: false,
-  //   };
+  const handleOfflinePinnedSong = async (id: any) => {
+    const result = await isPinnedOffline(id);
+    if (result) {
+      setisPinned(true);
+    } else {
+      setisPinned(false);
+    }
+  };
   useEffect(() => {
     navigation.setOptions({
       title: songData?.title,
       headerRight: () => (
-        <TouchableOpacity onPress={handlePinSong} style={{marginRight: 10}}>
-          <EntypoIcon
-            size={20}
-            name="pin"
-            color={isPinned ? '#3683AF' : 'gray'}
-          />
-        </TouchableOpacity>
+        <View style={{flexDirection: 'row'}}>
+          {mySong && (
+            <MaterialCommunityIcons
+              size={20}
+              name={
+                songData?.status == 'pending'
+                  ? 'progress-clock'
+                  : 'check-decagram'
+              }
+              color="#3683AF"
+              style={{marginRight: 10}}
+            />
+          )}
+
+          <TouchableOpacity onPress={handlePinSong} style={{marginRight: 10}}>
+            <EntypoIcon
+              size={20}
+              name="pin"
+              color={isPinned ? 'blue' : '#3683AF'}
+            />
+          </TouchableOpacity>
+        </View>
       ),
     });
     if (songData?.isPinned) {
       setisPinned(true);
+    } else {
+      handleOfflinePinnedSong(songData?._id);
     }
   }, [isPinned, songData]);
   const handlePinSong = () => {
     setisPinned(!isPinned);
+    pinSongsOffline(id, songData);
   };
+
   return (
     <SurfaceLayout>
-      <View style={styles.container}>
-        <View style={styles.subtitleContainer}>
-          <Text style={styles.subtitle}>{songData?.scale} </Text>
-          <Text style={styles.subtitle}>{songData?.beat} </Text>
-          <Text style={styles.subtitle}>R-{songData?.style} </Text>
-          <Text style={styles.subtitle}>T-{songData?.tempo} </Text>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <View style={styles.container}>
+          <View style={styles.subtitleContainer}>
+            <Text style={styles.subtitle}>{songData?.scale} </Text>
+            <Text style={styles.subtitle}>{songData?.beat} </Text>
+            <Text style={styles.subtitle}>R-{songData?.style} </Text>
+            <Text style={styles.subtitle}>T-{songData?.tempo} </Text>
+          </View>
+          <ScrollView
+            contentContainerStyle={{alignItems: 'center', marginTop: 10}}>
+            <Text
+              style={{
+                color: '#3683AF',
+                fontSize: 18,
+                textAlign: 'justify',
+              }}>
+              {typeof songData?.lyrics == 'string'
+                ? JSON.parse(songData?.lyrics)
+                : songData?.lyrics}
+            </Text>
+          </ScrollView>
         </View>
-        <ScrollView contentContainerStyle={{}}>
-          <Text
-            style={{
-              color: '#3683AF',
-              fontSize: 20,
-              textAlign: 'justify',
-            }}>
-            {songData?.lyrics}
-          </Text>
-        </ScrollView>
-      </View>
+      )}
     </SurfaceLayout>
   );
 };

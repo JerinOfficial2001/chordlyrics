@@ -1,5 +1,5 @@
 // src/screens/Home.tsx
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {Menu, ActivityIndicator, Avatar} from 'react-native-paper';
 import TopNavigation from '../navigation/TabNavigation';
@@ -8,17 +8,33 @@ import AntDesignIcons from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useGlobalContext} from '../utils/isAuthenticated';
 import AuthModal from '../components/Modals/AuthModal';
+import {useFocusEffect} from '@react-navigation/native';
 
 interface HomepageProps {
   props: any;
   navigation: any;
 }
 const Home = ({...props}) => {
-  const [isVisible, setisVisible] = useState(false);
   const [isloading, setisloading] = useState(false);
   const [isOpen, setisOpen] = useState(false);
-  const {isAuthenticated} = useGlobalContext();
 
+  const {cachedData, isVisible, setisVisible} = useGlobalContext();
+
+  const handleClick = () => {
+    handleCloseMenu();
+    if (cachedData) {
+      AsyncStorage.removeItem('chordlyrics_userData');
+      props.navigation.navigate('Home');
+    } else {
+      props.navigation.navigate('Auth');
+    }
+  };
+  const handleCloseModal = () => {
+    setisOpen(false);
+  };
+  const handleCloseMenu = () => {
+    setisVisible(false);
+  };
   useEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
@@ -27,7 +43,7 @@ const Home = ({...props}) => {
           visible={isVisible}
           onDismiss={() => setisVisible(false)}
           anchor={
-            isAuthenticated ? (
+            cachedData ? (
               <TouchableOpacity
                 onPress={() => setisVisible(true)}
                 style={{marginRight: 10}}>
@@ -56,35 +72,22 @@ const Home = ({...props}) => {
                   <ActivityIndicator animating={true} />
                 ) : (
                   <AntDesignIcons
-                    name={isAuthenticated ? 'logout' : 'login'}
+                    name={cachedData ? 'logout' : 'login'}
                     size={24}
                     color="#3683AF"
                   />
                 )}
               </View>
             )}
-            title={isAuthenticated ? 'Logout' : 'Login'}
+            title={cachedData ? 'Logout' : 'Login'}
             // titleStyle={{color: jersAppTheme.title}}
             onPress={handleClick}
           />
         </Menu>
       ),
     });
-  }, [isVisible]);
-  const handleClick = () => {
-    if (isAuthenticated) {
-      undefined;
-    } else {
-      props.navigation.navigate('Auth');
-    }
-    handleCloseMenu();
-  };
-  const handleCloseModal = () => {
-    setisOpen(false);
-  };
-  const handleCloseMenu = () => {
-    setisVisible(false);
-  };
+  }, [isVisible, cachedData]);
+
   return (
     <View style={styles.container}>
       <TopNavigation props={props} />

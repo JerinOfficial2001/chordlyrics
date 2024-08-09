@@ -8,42 +8,50 @@ import {useGlobalContext} from '../utils/isAuthenticated';
 import {useFocusEffect} from '@react-navigation/native';
 import {useQuery} from '@tanstack/react-query';
 import {getIndexs} from '../controllers/songs';
+import Loader from '../components/Loader';
 interface SongIndexProps {
   props: any;
+  route: any;
 }
-const SongIndex = ({...props}) => {
+const SongIndex = ({route, ...props}: any) => {
   const {setcurrentRoute} = useGlobalContext();
+  const {key} = route.params;
+
   useFocusEffect(
     useCallback(() => {
       setcurrentRoute('SongIndex');
     }, []),
   );
-  const {data: SongIndex} = useQuery({
-    queryKey: ['SongIndexs'],
+  const {data: SongIndex, isLoading} = useQuery({
+    queryKey: ['SongIndex', key],
     queryFn: getIndexs,
   });
 
   return (
     <SurfaceLayout>
-      <View style={styles.container}>
-        {SongIndex?.map((item: any, index: any) => {
-          return (
-            <SongCard
-              key={index}
-              props={{
-                variant: 'Index',
-                name: item.title,
-                total_songs: item.totalSongs,
-              }}
-              onPress={() => {
-                props.navigation.navigate('Songs', {
-                  index: item.title,
-                });
-              }}
-            />
-          );
-        })}
-      </View>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <View style={styles.container}>
+          {SongIndex?.map((item: any, index: any) => {
+            return (
+              <SongCard
+                key={index}
+                props={{
+                  variant: 'Index',
+                  name: item.title,
+                  total_songs: item.totalSongs,
+                }}
+                onPress={() => {
+                  props.navigation.navigate('Songs', {
+                    index: item.title,
+                  });
+                }}
+              />
+            );
+          })}
+        </View>
+      )}
     </SurfaceLayout>
   );
 };

@@ -1,4 +1,11 @@
-import {View, Text, StyleSheet, Alert, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  ToastAndroid,
+} from 'react-native';
 import {Modal, Portal} from 'react-native-paper';
 import React, {useState, useEffect} from 'react';
 import TextField from '../TextField';
@@ -10,10 +17,18 @@ type Props = {
   handleDismiss: any;
   name: string;
   data?: any;
+  keyData?: any;
 };
 
-const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
+const AddDataModal = ({
+  name,
+  isVisible,
+  handleDismiss,
+  data,
+  keyData,
+}: Props) => {
   const navigation = useNavigation<any>();
+  const [isLoading, setisLoading] = useState(false);
   const [inputDatas, setinputDatas] = useState({
     title: '',
     scale: '',
@@ -24,6 +39,8 @@ const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
     isPinned: false,
     language: '',
     keyboardModal: '',
+    _id: '',
+    user_id: '',
   });
   const handleOnchange = (key: string, value: any) => {
     setinputDatas(prev => ({
@@ -47,7 +64,7 @@ const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
     {
       name: 'keyboardModal',
       value: inputDatas.keyboardModal,
-      label: 'Keyboard Modal',
+      label: 'Keyboard Model',
       onChange: (value: any) => handleOnchange('keyboardModal', value),
       type: 'text',
       keyboardtype: 'default',
@@ -99,18 +116,29 @@ const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
   const [selectedBeat, setselectedBeat] = useState(
     Beats.map(() => ({isSelected: false})),
   );
+
   useEffect(() => {
-    setselectedBeat(Beats.map((_, index) => ({isSelected: index === 0})));
+    setselectedBeat(
+      Beats.map((_, index) => ({
+        isSelected: index === Beats.indexOf(inputDatas.beat),
+      })),
+    );
     setinputDatas({
       title: data ? data.title : '',
       scale: data ? data.scale : '',
-      tempo: data ? data.tempo : '',
+      tempo: data
+        ? typeof data.tempo == 'number'
+          ? JSON.stringify(data.tempo)
+          : data.tempo
+        : '',
       style: data ? data.style : '',
       beat: data ? data.beat : '1/4',
       status: data ? data.status : 'pending',
       isPinned: data ? data.isPinned : false,
       language: data ? data.language : '',
       keyboardModal: data ? data.keyboardModal : '',
+      _id: data ? data._id : '',
+      user_id: data ? data.user_id : '',
     });
   }, [isVisible]);
 
@@ -121,6 +149,7 @@ const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
     handleFormDatas('beat', Beats[index]);
   };
   const handleSubmit = () => {
+    setisLoading(true);
     const data: any = {
       title: inputDatas.title,
       scale: inputDatas.scale,
@@ -143,11 +172,13 @@ const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
     if (isFilled) {
       navigation.navigate('AddSong', {
         data: inputDatas,
+        key: keyData,
       });
       handleDismiss();
     } else {
-      Alert.alert('All fields are mandatory');
+      ToastAndroid.show('All fields are mandatory', ToastAndroid.SHORT);
     }
+    setisLoading(false);
   };
   return (
     <Portal>
@@ -214,7 +245,11 @@ const AddDataModal = ({name, isVisible, handleDismiss, data}: Props) => {
               }
             })}
           </View>
-          <ButtonComponent onPress={handleSubmit} name="Next" />
+          <ButtonComponent
+            onPress={handleSubmit}
+            name="Next"
+            isLoading={isLoading}
+          />
         </View>
       </Modal>
     </Portal>

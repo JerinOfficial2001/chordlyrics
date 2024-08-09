@@ -1,40 +1,39 @@
-// src/screens/Songs.tsx
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import React, {useCallback} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
-import TopNavigation from '../navigation/TabNavigation';
-import SongCard from '../components/SongCard';
-import SurfaceLayout from '../layouts/SurfaceLayout';
-import {useFocusEffect} from '@react-navigation/native';
-import {useGlobalContext} from '../utils/isAuthenticated';
-import {getTitles} from '../controllers/songs';
+import SurfaceLayout from '../../layouts/SurfaceLayout';
+import {useGlobalContext} from '../../utils/isAuthenticated';
 import {useQuery} from '@tanstack/react-query';
-import Loader from '../components/Loader';
+import {useFocusEffect} from '@react-navigation/native';
+import Loader from '../../components/Loader';
+import SongCard from '../../components/SongCard';
+import {getPinnedOfflineSongs} from '../../controllers/pinSongs';
 
-interface SongsProps {
-  props: any;
-  routes: any;
-}
-const Songs = ({route, ...props}: any) => {
-  const {index} = route.params;
+type Props = {};
 
-  const {setcurrentRoute, cachedData} = useGlobalContext();
+const PinnedSongs = ({props}: any) => {
+  const {cachedData} = useGlobalContext();
+
+  const {
+    data: MySongs,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['PinnedSongs'],
+    queryFn: getPinnedOfflineSongs,
+  });
   useFocusEffect(
     useCallback(() => {
-      setcurrentRoute('Songs');
+      refetch();
     }, []),
   );
-  const {data: SongTitles, isLoading} = useQuery({
-    queryKey: ['SongIndexs', index],
-    queryFn: getTitles,
-  });
 
   return (
     <SurfaceLayout>
       {isLoading ? (
         <Loader />
-      ) : (
+      ) : MySongs.length > 0 ? (
         <FlatList
-          data={SongTitles}
+          data={MySongs}
           keyExtractor={key => key._id}
           renderItem={({item, index}) => {
             return (
@@ -63,11 +62,12 @@ const Songs = ({route, ...props}: any) => {
           }}
           contentContainerStyle={styles.container}
         />
+      ) : (
+        <Loader empty={true} />
       )}
     </SurfaceLayout>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     padding: 10,
@@ -75,5 +75,4 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 });
-
-export default Songs;
+export default PinnedSongs;

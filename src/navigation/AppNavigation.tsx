@@ -34,7 +34,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
   const [isOpen, setisOpen] = useState(false);
-  const {showFloatButton, currentRoute, isAuthenticated} = useGlobalContext();
+  const {showFloatButton, currentRoute, cachedData} = useGlobalContext();
 
   const styles = StyleSheet.create({
     FloatableButton: {
@@ -120,7 +120,7 @@ const AppNavigator: React.FC = () => {
           component={AddSong}
         />
       </Stack.Navigator>
-      {showFloatButton && isAuthenticated && (
+      {showFloatButton && cachedData && (
         <TouchableOpacity
           onPress={() => setisOpen(true)}
           style={styles.FloatableButton}>

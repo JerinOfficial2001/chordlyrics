@@ -1,12 +1,19 @@
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
 import React from 'react';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // type Props = {
 //   variant: string;
 // };
 
-const SongCard = ({props, onPress, isPinned}: any) => {
+const SongCard = ({props, onPress, isPinned, isAdmin, onPressEdit}: any) => {
   const styles = StyleSheet.create({
     cardShadow: {
       borderRadius: 16,
@@ -26,9 +33,18 @@ const SongCard = ({props, onPress, isPinned}: any) => {
       backgroundColor: '#C7D7E0',
       overflow: 'hidden',
       height:
-        props.variant == 'Index' ? 80 : props.variant == 'Songs' ? 90 : 60,
+        props.variant == 'Index'
+          ? 80
+          : props.variant == 'Songs'
+          ? 90
+          : props.songTitle
+          ? 100
+          : 60,
       justifyContent: 'center',
-      alignItems: props.variant == 'Songs' ? 'flex-start' : 'center',
+      alignItems:
+        props.variant == 'Songs' || props.variant == 'MySongs'
+          ? 'flex-start'
+          : 'center',
       flexDirection: 'column',
       padding: 10,
       gap: props.variant == 'Songs' ? 10 : 0,
@@ -56,6 +72,7 @@ const SongCard = ({props, onPress, isPinned}: any) => {
       top: 15,
     },
   });
+
   return (
     <Pressable
       onPress={onPress}
@@ -70,9 +87,26 @@ const SongCard = ({props, onPress, isPinned}: any) => {
               style={styles.pin}
             />
           )}
+          {isAdmin && (
+            <TouchableOpacity style={styles.pin} onPress={onPressEdit}>
+              <EntypoIcon size={20} name="edit" color="#3683AF" />
+            </TouchableOpacity>
+          )}
+          {props.variant == 'MySongs' && (
+            <MaterialCommunityIcons
+              size={20}
+              name={
+                props.data.status == 'pending'
+                  ? 'progress-clock'
+                  : 'check-decagram'
+              }
+              color="#3683AF"
+              style={styles.pin}
+            />
+          )}
 
           {props.s_no ? (
-            <Text style={styles.title}>
+            <Text style={styles.title} numberOfLines={1}>
               {props.s_no} . {props.name}
             </Text>
           ) : (
@@ -81,7 +115,18 @@ const SongCard = ({props, onPress, isPinned}: any) => {
           {props.total_songs && (
             <Text style={styles.subtitle}>{props.total_songs} Songs</Text>
           )}
-          {props.variant == 'Songs' && (
+          {props.songTitle && (
+            <View style={{margin: 10}}>
+              <Text
+                style={[styles.title, {color: '#357FA896'}]}
+                numberOfLines={1}>
+                Song : {props.songTitle}
+              </Text>
+            </View>
+          )}
+          {(props.variant == 'Songs' ||
+            props.variant == 'MySongs' ||
+            props.variant == 'PendingSongs') && (
             <View style={styles.subtitleContainer}>
               <Text style={styles.subtitle}>{props.data.scale} </Text>
               <Text style={styles.subtitle}>{props.data.beat} </Text>
