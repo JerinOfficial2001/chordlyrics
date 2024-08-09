@@ -14,7 +14,12 @@ import ButtonComponent from '../components/ButtonComponent';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import AddDataModal from '../components/Modals/AddDataModal';
 import {QueryClient, useMutation} from '@tanstack/react-query';
-import {addSong, approveSongs, updateSong} from '../controllers/songs';
+import {
+  addSong,
+  approveSongs,
+  isNetworkAvailable,
+  updateSong,
+} from '../controllers/songs';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ActivityIndicator} from 'react-native-paper';
@@ -113,12 +118,17 @@ const AddSong = ({route, navigation}: any) => {
       ToastAndroid.show('All fields are mandatory', ToastAndroid.SHORT);
     }
   };
-  const handleApprove = () => {
-    approve({
-      id: cachedData._id,
-      songId: data._id,
-      token: cachedData.accessToken,
-    });
+  const handleApprove = async () => {
+    const networkAvailable = await isNetworkAvailable();
+    if (networkAvailable) {
+      approve({
+        id: cachedData._id,
+        songId: data._id,
+        token: cachedData.accessToken,
+      });
+    } else {
+      ToastAndroid.show('You are offline', ToastAndroid.SHORT);
+    }
   };
 
   useEffect(() => {

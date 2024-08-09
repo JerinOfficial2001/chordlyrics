@@ -34,7 +34,7 @@ const Keyboards = ({props}: any) => {
       ) : Keyboards.length > 0 ? (
         <FlatList
           data={Keyboards}
-          keyExtractor={key => key._id}
+          keyExtractor={key => key}
           renderItem={({item, index}) => {
             return (
               <SongCard

@@ -11,6 +11,7 @@ import React, {useState, useEffect} from 'react';
 import TextField from '../TextField';
 import ButtonComponent from '../ButtonComponent';
 import {useNavigation} from '@react-navigation/native';
+import {isNetworkAvailable} from '../../controllers/songs';
 
 type Props = {
   isVisible: boolean;
@@ -155,37 +156,42 @@ const AddDataModal = ({
     setselectedBeat(prevBeats);
     handleFormDatas('beat', Beats[index]);
   };
-  const handleSubmit = () => {
-    setisLoading(true);
-    const data: any = {
-      title: inputDatas.title,
-      scale: inputDatas.scale,
-      tempo: inputDatas.tempo,
-      style: inputDatas.style,
-      beat: inputDatas.beat,
-      language: inputDatas.language,
-      keyboardModal: inputDatas.keyboardModal,
-    };
-    const requiredField = [
-      'title',
-      'scale',
-      'tempo',
-      'style',
-      'beat',
-      'language',
-      'keyboardModal',
-    ];
-    const isFilled = requiredField.every(elem => data[elem] != '');
-    if (isFilled) {
-      navigation.navigate('AddSong', {
-        data: inputDatas,
-        key: keyData,
-      });
-      handleDismiss();
+  const handleSubmit = async () => {
+    const networkAvailable = await isNetworkAvailable();
+    if (networkAvailable) {
+      setisLoading(true);
+      const data: any = {
+        title: inputDatas.title,
+        scale: inputDatas.scale,
+        tempo: inputDatas.tempo,
+        style: inputDatas.style,
+        beat: inputDatas.beat,
+        language: inputDatas.language,
+        keyboardModal: inputDatas.keyboardModal,
+      };
+      const requiredField = [
+        'title',
+        'scale',
+        'tempo',
+        'style',
+        'beat',
+        'language',
+        'keyboardModal',
+      ];
+      const isFilled = requiredField.every(elem => data[elem] != '');
+      if (isFilled) {
+        navigation.navigate('AddSong', {
+          data: inputDatas,
+          key: keyData,
+        });
+        handleDismiss();
+      } else {
+        ToastAndroid.show('All fields are mandatory', ToastAndroid.SHORT);
+      }
+      setisLoading(false);
     } else {
-      ToastAndroid.show('All fields are mandatory', ToastAndroid.SHORT);
+      ToastAndroid.show('You are offline', ToastAndroid.SHORT);
     }
-    setisLoading(false);
   };
   return (
     <Portal>

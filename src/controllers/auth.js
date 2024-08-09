@@ -2,21 +2,27 @@ import axios from 'axios';
 import {Base_Url} from '../api';
 import {ToastAndroid} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {isNetworkAvailable} from './songs';
 
 export const login = async formData => {
-  try {
-    const {data} = await axios.post(Base_Url + '/auth/login', formData);
-    if (data) {
-      if (data.status == 'ok' && data.token) {
-        const result = await userData(data.token);
-        return result;
-      } else {
-        ToastAndroid.show(data.message, ToastAndroid.SHORT);
-        return data;
+  const networkAvailable = await isNetworkAvailable();
+  if (networkAvailable) {
+    try {
+      const {data} = await axios.post(Base_Url + '/auth/login', formData);
+      if (data) {
+        if (data.status == 'ok' && data.token) {
+          const result = await userData(data.token);
+          return result;
+        } else {
+          ToastAndroid.show(data.message, ToastAndroid.SHORT);
+          return data;
+        }
       }
+    } catch (error) {
+      ToastAndroid.show('Login failed', ToastAndroid.SHORT);
     }
-  } catch (error) {
-    ToastAndroid.show('Login failed', ToastAndroid.SHORT);
+  } else {
+    ToastAndroid.show('You are offline', ToastAndroid.SHORT);
   }
 };
 export const register = async formData => {
