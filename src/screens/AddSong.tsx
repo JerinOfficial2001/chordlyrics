@@ -135,7 +135,9 @@ const AddSong = ({route, navigation}: any) => {
     navigation.setOptions({
       title: data?.title,
       headerRight: () =>
-        key != 'edit' ? (
+        key == 'approve' &&
+        cachedData &&
+        (cachedData.role == 'ADMIN' || cachedData.role == 'admin') ? (
           <View style={{flexDirection: 'row'}}>
             {approvalPending ? (
               <ActivityIndicator style={{marginRight: 10}} color="#3683AF" />

@@ -377,7 +377,43 @@ const retrieveFilterDatasLocally = async (key, value) => {
     return [];
   }
 };
-
+export const retrieveSearchDataLocally = async key => {
+  const keyValue = key.queryKey[1];
+  try {
+    const data = await AsyncStorage.getItem('chordlyrics_localData');
+    const allData = data ? JSON.parse(data) : [];
+    if (allData.length > 0) {
+      const result = allData.filter(elem => {
+        if (elem.scale.toLowerCase() == keyValue.toLowerCase()) {
+          return {elem, category: 'scale'};
+        } else if (elem.beat == keyValue) {
+          return {elem, category: 'beat'};
+        } else if (
+          elem.title.toLowerCase() == keyValue.toLowerCase() ||
+          elem.title.toLowerCase().includes(keyValue.toLowerCase())
+        ) {
+          return {elem, category: 'title'};
+        } else if (
+          elem.keyboardModal.toLowerCase() == keyValue.toLowerCase() ||
+          elem.keyboardModal.toLowerCase().includes(keyValue.toLowerCase())
+        ) {
+          return {elem, category: 'keyboard'};
+        } else if (
+          elem.language.toLowerCase() == keyValue.toLowerCase() ||
+          elem.language.toLowerCase().includes(keyValue.toLowerCase())
+        ) {
+          return {elem, category: 'language'};
+        }
+      });
+      return result;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error retrieving data from local storage:', error);
+    return [];
+  }
+};
 export const isNetworkAvailable = async () => {
   const state = await NetInfo.fetch();
   return state.isConnected;

@@ -75,8 +75,8 @@ const SongRequests = ({props}: any) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    flex: 1,
     gap: 10,
+    paddingBottom: 100,
   },
 });
 export default SongRequests;

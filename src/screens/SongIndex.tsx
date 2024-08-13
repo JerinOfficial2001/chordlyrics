@@ -58,13 +58,13 @@ const SongIndex = ({route, ...props}: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 23,
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     flex: 1,
     padding: 10,
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 15,
   },
 });
 

@@ -1,7 +1,14 @@
 // src/screens/Home.tsx
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {Menu, ActivityIndicator, Avatar} from 'react-native-paper';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+} from 'react-native';
+import {Menu, ActivityIndicator, Avatar, Searchbar} from 'react-native-paper';
 import TopNavigation from '../navigation/TabNavigation';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import AntDesignIcons from 'react-native-vector-icons/AntDesign';
@@ -9,6 +16,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useGlobalContext} from '../utils/isAuthenticated';
 import AuthModal from '../components/Modals/AuthModal';
 import {useFocusEffect} from '@react-navigation/native';
+import TextField from '../components/TextField';
+import SurfaceLayout from '../layouts/SurfaceLayout';
+import Loader from '../components/Loader';
+import SongCard from '../components/SongCard';
+import {useQuery} from '@tanstack/react-query';
+import {getAllSongs, retrieveSearchDataLocally} from '../controllers/songs';
 
 interface HomepageProps {
   props: any;
@@ -17,8 +30,13 @@ interface HomepageProps {
 const Home = ({...props}) => {
   const [isloading, setisloading] = useState(false);
   const [isOpen, setisOpen] = useState(false);
-
-  const {cachedData, isVisible, setisVisible} = useGlobalContext();
+  const {
+    cachedData,
+    isVisible,
+    setisVisible,
+    setshowFloatButton,
+    showFloatButton,
+  } = useGlobalContext();
 
   const handleClick = () => {
     handleCloseMenu();
@@ -87,18 +105,114 @@ const Home = ({...props}) => {
       ),
     });
   }, [isVisible, cachedData]);
+  const [searchText, setsearchText] = useState('');
+  const handleSearchText = (value: string) => {
+    setsearchText(value);
+  };
+  const {
+    data: AllSongs,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['searchResults', searchText],
+    queryFn: retrieveSearchDataLocally,
+  });
+  useFocusEffect(
+    useCallback(() => {
+      if (!searchText && cachedData) {
+        setshowFloatButton(true);
+      } else {
+        setshowFloatButton(false);
+      }
+      if (searchText) {
+        setTimeout(() => {
+          refetch();
+        }, 1000);
+      }
+    }, [showFloatButton, searchText]),
+  );
 
   return (
-    <View style={styles.container}>
-      <TopNavigation props={props} />
+    <View style={styles.mainContainer}>
+      <View
+        style={{
+          width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 1,
+          marginBottom: searchText ? 10 : 0,
+        }}>
+        <Searchbar
+          placeholder="Search "
+          onChangeText={val => handleSearchText(val)}
+          value={searchText}
+          style={{
+            width: '95%',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        />
+      </View>
+      {searchText ? (
+        <SurfaceLayout>
+          {isLoading ? (
+            <Loader />
+          ) : AllSongs.length > 0 ? (
+            <FlatList
+              data={AllSongs}
+              keyExtractor={key => key._id}
+              renderItem={({item, index}) => {
+                return (
+                  <SongCard
+                    props={{
+                      variant: 'Songs',
+                      name: item.title,
+                      data: item,
+                      s_no: index + 1,
+                    }}
+                    isPinned={item.isPinned}
+                    onPress={() =>
+                      props.navigation.navigate('ViewSong', {
+                        id: item._id,
+                      })
+                    }
+                    onPressEdit={() =>
+                      props.navigation.navigate('AddSong', {
+                        key: 'edit',
+                        data: item,
+                      })
+                    }
+                    isAdmin={
+                      cachedData &&
+                      (cachedData.role == 'admin' || cachedData.role == 'ADMIN')
+                    }
+                  />
+                );
+              }}
+              contentContainerStyle={styles.container}
+            />
+          ) : (
+            <Loader empty={true} />
+          )}
+        </SurfaceLayout>
+      ) : (
+        <TopNavigation props={props} />
+      )}
       <AuthModal isVisible={isOpen} handleDismiss={handleCloseModal} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
+    backgroundColor: '#C3E0F0',
+  },
+  container: {
+    padding: 10,
+    gap: 10,
+    paddingBottom: 100,
   },
 });
 

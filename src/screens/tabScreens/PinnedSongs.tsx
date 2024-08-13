@@ -44,7 +44,7 @@ const PinnedSongs = ({props}: any) => {
                   data: item,
                   s_no: index + 1,
                 }}
-                isPinned={item.isPinned}
+                // isPinned={item.isPinned}
                 onPress={() =>
                   props.navigation.navigate('ViewSong', {
                     id: item._id,
@@ -56,7 +56,10 @@ const PinnedSongs = ({props}: any) => {
                     data: item,
                   })
                 }
-                isAdmin={cachedData && cachedData.role == 'admin'}
+                isAdmin={
+                  cachedData &&
+                  (cachedData.role == 'admin' || cachedData.role == 'ADMIN')
+                }
               />
             );
           }}
@@ -71,7 +74,7 @@ const PinnedSongs = ({props}: any) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    flex: 1,
+    paddingBottom: 100,
     gap: 10,
   },
 });

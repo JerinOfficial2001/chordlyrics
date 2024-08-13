@@ -57,7 +57,10 @@ const Songs = ({route, ...props}: any) => {
                     data: item,
                   })
                 }
-                isAdmin={cachedData && cachedData.role == 'admin'}
+                isAdmin={
+                  cachedData &&
+                  (cachedData.role == 'admin' || cachedData.role == 'ADMIN')
+                }
               />
             );
           }}
@@ -71,7 +74,6 @@ const Songs = ({route, ...props}: any) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    flex: 1,
     gap: 10,
   },
 });
