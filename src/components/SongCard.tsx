@@ -8,12 +8,20 @@ import {
 import React from 'react';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 // type Props = {
 //   variant: string;
 // };
 
-const SongCard = ({props, onPress, isPinned, isAdmin, onPressEdit}: any) => {
+const SongCard = ({
+  props,
+  onPress,
+  isPinned,
+  isAdmin,
+  onPressEdit,
+  onPressDelete,
+}: any) => {
   const styles = StyleSheet.create({
     cardShadow: {
       borderRadius: 16,
@@ -36,7 +44,7 @@ const SongCard = ({props, onPress, isPinned, isAdmin, onPressEdit}: any) => {
         props.variant == 'Index'
           ? 80
           : props.variant == 'Songs'
-          ? 90
+          ? 60
           : props.songTitle
           ? 100
           : 60,
@@ -79,7 +87,7 @@ const SongCard = ({props, onPress, isPinned, isAdmin, onPressEdit}: any) => {
       style={{width: props.variant == 'Index' ? 80 : '100%'}}>
       <View style={styles.cardShadow}>
         <View style={styles.container}>
-          {isPinned && (
+          {isPinned && props.variant != 'MySongs' && !isAdmin && (
             <EntypoIcon
               size={20}
               name="pin"
@@ -87,26 +95,68 @@ const SongCard = ({props, onPress, isPinned, isAdmin, onPressEdit}: any) => {
               style={styles.pin}
             />
           )}
-          {isAdmin && (
-            <TouchableOpacity style={styles.pin} onPress={onPressEdit}>
-              <EntypoIcon size={20} name="edit" color="#3683AF" />
-            </TouchableOpacity>
-          )}
-          {props.variant == 'MySongs' && (
-            <MaterialCommunityIcons
-              size={20}
-              name={
-                props.data.status == 'pending'
-                  ? 'progress-clock'
-                  : 'check-decagram'
-              }
-              color="#3683AF"
-              style={styles.pin}
-            />
+
+          {(props.variant == 'PendingSongs' ||
+            props.variant == 'MySongs' ||
+            isAdmin) && (
+            <View
+              style={[
+                styles.pin,
+                {
+                  alignItems: 'flex-end',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  gap: 5,
+                  top: 9,
+                },
+              ]}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  gap: 5,
+                }}>
+                {!isAdmin && props.variant != 'PendingSongs' && (
+                  <MaterialCommunityIcons
+                    size={20}
+                    name={
+                      props.data.status == 'pending'
+                        ? 'progress-clock'
+                        : 'check-decagram'
+                    }
+                    color="#3683AF"
+                  />
+                )}
+                {props.variant != 'PendingSongs' && (
+                  <TouchableOpacity onPress={onPressEdit}>
+                    <FontAwesomeIcon size={20} name="edit" color="#3683AF" />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity onPress={onPressDelete}>
+                  <MaterialCommunityIcons
+                    size={20}
+                    name="delete-circle-outline"
+                    color="#3683AF"
+                  />
+                </TouchableOpacity>
+              </View>
+              {isPinned && props.variant != 'PendingSongs' && (
+                <EntypoIcon size={18} name="pin" color="#3683AF" />
+              )}
+            </View>
           )}
 
           {props.s_no ? (
-            <Text style={styles.title} numberOfLines={1}>
+            <Text
+              style={[
+                styles.title,
+                {
+                  maxWidth:
+                    props.variant == 'MySongs' || isAdmin ? '86%' : 'auto',
+                },
+              ]}
+              numberOfLines={1}>
               {props.s_no} . {props.name}
             </Text>
           ) : (

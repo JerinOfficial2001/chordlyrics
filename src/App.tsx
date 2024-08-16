@@ -12,15 +12,15 @@ const theme = {
     primary: '#3683AF',
   },
 };
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 export default function App() {
   return (
-    <AuthContextAPI>
-      <PaperProvider theme={theme}>
-        <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <AuthContextAPI>
+        <PaperProvider theme={theme}>
           <AppNavigator />
-        </QueryClientProvider>
-      </PaperProvider>
-    </AuthContextAPI>
+        </PaperProvider>
+      </AuthContextAPI>
+    </QueryClientProvider>
   );
 }

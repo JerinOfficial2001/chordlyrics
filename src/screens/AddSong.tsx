@@ -56,6 +56,8 @@ const AddSong = ({route, navigation}: any) => {
       navigation.navigate('Home', {screen: 'My songs'});
     },
     onError: error => {
+      console.log(error);
+
       ToastAndroid.show('Unable to add', ToastAndroid.SHORT);
     },
   });
@@ -66,13 +68,15 @@ const AddSong = ({route, navigation}: any) => {
       navigation.navigate('Home', {screen: 'AllSongs'});
     },
     onError: error => {
-      ToastAndroid.show('Unable to add', ToastAndroid.SHORT);
+      console.log(error);
+
+      ToastAndroid.show('Unable to update', ToastAndroid.SHORT);
     },
   });
   const {mutate: approve, isPending: approvalPending} = useMutation({
     mutationFn: approveSongs,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['approveSongs']});
+      queryClient.invalidateQueries({queryKey: ['PendingSongs']});
       navigation.navigate('Home', {screen: 'SongRequests'});
     },
     onError: error => {
@@ -149,6 +153,10 @@ const AddSong = ({route, navigation}: any) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 2,
+                  borderColor: 'green',
+                  borderWidth: 3,
+                  borderRadius: 10,
+                  paddingHorizontal: 5,
                 }}>
                 <EntypoIcon size={20} name="check" color={'green'} />
                 <Text

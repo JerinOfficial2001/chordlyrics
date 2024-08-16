@@ -14,14 +14,15 @@ import {useFocusEffect} from '@react-navigation/native';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useQuery} from '@tanstack/react-query';
-import {getLyrics} from '../controllers/songs';
+import {getLyrics, isNetworkAvailable, pinSong} from '../controllers/songs';
 import Loader from '../components/Loader';
-import {isPinnedOffline, pinSongsOffline} from '../controllers/pinSongs';
+import {pinSongsOffline} from '../controllers/pinSongs';
+import {queryClient} from '../App';
 
 const ViewSong: React.FC<any> = ({navigation, route, ...props}) => {
   const {id, mySong} = route.params;
 
-  const {setshowFloatButton, showFloatButton} = useGlobalContext();
+  const {setshowFloatButton, showFloatButton, cachedData} = useGlobalContext();
   const [isPinned, setisPinned] = useState(false);
   useFocusEffect(
     useCallback(() => {
@@ -32,15 +33,14 @@ const ViewSong: React.FC<any> = ({navigation, route, ...props}) => {
     queryKey: ['SongLyrics', id],
     queryFn: getLyrics,
   });
-  const handleOfflinePinnedSong = async (id: any) => {
-    const result = await isPinnedOffline(id);
-    if (result) {
-      setisPinned(true);
+
+  useEffect(() => {
+    if (songData?.isPinned) {
+      setisPinned(songData?.isPinned);
     } else {
       setisPinned(false);
     }
-  };
-  useEffect(() => {
+
     navigation.setOptions({
       title: songData?.title,
       headerRight: () => (
@@ -68,15 +68,19 @@ const ViewSong: React.FC<any> = ({navigation, route, ...props}) => {
         </View>
       ),
     });
-    if (songData?.isPinned) {
-      setisPinned(true);
-    } else {
-      handleOfflinePinnedSong(songData?._id);
-    }
-  }, [isPinned, songData]);
-  const handlePinSong = () => {
+  }, [songData, isPinned]);
+  const handlePinSong = async () => {
     setisPinned(!isPinned);
-    pinSongsOffline(id, songData);
+    const networkAvailable = await isNetworkAvailable();
+
+    if (cachedData && networkAvailable) {
+      pinSong(id, !isPinned);
+      queryClient.invalidateQueries({queryKey: ['SongIndexs']});
+      queryClient.invalidateQueries({queryKey: ['MySongs']});
+      queryClient.invalidateQueries({queryKey: ['SongLyrics']});
+    } else {
+      pinSongsOffline(id, songData, !isPinned);
+    }
   };
 
   return (

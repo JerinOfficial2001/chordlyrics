@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     padding: 10,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     gap: 15,
   },
 });

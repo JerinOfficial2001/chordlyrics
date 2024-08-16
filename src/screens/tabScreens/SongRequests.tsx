@@ -11,7 +11,8 @@ import {getPendingSongs} from '../../controllers/songs';
 type Props = {};
 
 const SongRequests = ({props}: any) => {
-  const {cachedData} = useGlobalContext();
+  const {cachedData, deleteSongFunctions} = useGlobalContext();
+  const {handleOpenDeleteModal, deletionLoading} = deleteSongFunctions;
 
   const {
     data: MySongs,
@@ -61,6 +62,7 @@ const SongRequests = ({props}: any) => {
                     key: 'approve',
                   });
                 }}
+                onPressDelete={() => handleOpenDeleteModal(item._id)}
               />
             );
           }}

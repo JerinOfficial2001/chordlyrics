@@ -6,12 +6,24 @@ import NetInfo from '@react-native-community/netinfo';
 
 export const getAllSongs = async () => {
   const networkAvailable = await isNetworkAvailable();
-  if (networkAvailable) {
-    const {data} = await axios.get(Base_Url + '/song/getAllSongs');
+  const catchData = await AsyncStorage.getItem('chordlyrics_userData');
+  const userData = catchData ? JSON.parse(catchData) : false;
+  const headers = userData
+    ? {
+        headers: {
+          Authorization: `Bearer ${userData.accessToken}`,
+        },
+      }
+    : {};
+
+  if (networkAvailable && userData) {
+    const {data} = await axios.get(Base_Url + '/song/getAllSongs', headers);
+
     try {
       if (data) {
         if (data.status == 'ok') {
           storeDataLocally(data.data);
+
           return data.data;
         } else {
           return [];
@@ -22,6 +34,7 @@ export const getAllSongs = async () => {
     }
   } else {
     const localData = await retrieveDataLocally();
+
     if (localData) {
       return localData;
     } else {
@@ -76,7 +89,10 @@ export const getLanguages = async key => {
 };
 export const getIndexs = async key => {
   const networkAvailable = await isNetworkAvailable();
-  if (networkAvailable) {
+  const catchData = await AsyncStorage.getItem('chordlyrics_userData');
+  const userData = catchData ? JSON.parse(catchData) : false;
+
+  if (networkAvailable && catchData) {
     const {data} = await axios.get(
       Base_Url + '/song/getIndex?language=' + key.queryKey[1],
     );
@@ -98,9 +114,19 @@ export const getIndexs = async key => {
 };
 export const getTitles = async index => {
   const networkAvailable = await isNetworkAvailable();
-  if (networkAvailable) {
+  const catchData = await AsyncStorage.getItem('chordlyrics_userData');
+  const userData = catchData ? JSON.parse(catchData) : false;
+  const headers = userData
+    ? {
+        headers: {
+          Authorization: `Bearer ${userData.accessToken}`,
+        },
+      }
+    : {};
+  if (networkAvailable && userData) {
     const {data} = await axios.get(
       Base_Url + '/song/getSongTitles?index=' + index.queryKey[1],
+      headers,
     );
     try {
       if (data) {
@@ -122,9 +148,19 @@ export const getTitles = async index => {
 
 export const getLyrics = async id => {
   const networkAvailable = await isNetworkAvailable();
-  if (networkAvailable) {
+  const catchData = await AsyncStorage.getItem('chordlyrics_userData');
+  const userData = catchData ? JSON.parse(catchData) : false;
+  const headers = userData
+    ? {
+        headers: {
+          Authorization: `Bearer ${userData.accessToken}`,
+        },
+      }
+    : {};
+  if (networkAvailable && userData) {
     const {data} = await axios.get(
       Base_Url + '/song/getSong/' + id.queryKey[1],
+      headers,
     );
     try {
       if (data) {
@@ -143,16 +179,16 @@ export const getLyrics = async id => {
   }
 };
 export const addSong = async formDatas => {
-  const {data} = await axios.post(
-    Base_Url + '/song/addSong?userId=' + formDatas.id,
-    formDatas.data,
-    {
-      headers: {
-        Authorization: `Bearer ${formDatas.token}`,
-      },
-    },
-  );
   try {
+    const {data} = await axios.post(
+      Base_Url + '/song/addSong?userId=' + formDatas.id,
+      formDatas.data,
+      {
+        headers: {
+          Authorization: `Bearer ${formDatas.token}`,
+        },
+      },
+    );
     if (data) {
       if (data.status == 'ok') {
         ToastAndroid.show(data.message, ToastAndroid.SHORT);
@@ -284,6 +320,55 @@ export const updateSong = async formDatas => {
     ToastAndroid.show('Add song failed', ToastAndroid.SHORT);
   }
 };
+export const pinSong = async (id, isPinned) => {
+  const catchData = await AsyncStorage.getItem('chordlyrics_userData');
+  const userData = catchData ? JSON.parse(catchData) : false;
+
+  const {data} = await axios.put(
+    Base_Url + '/song/pinsong/' + id + '?userId=' + userData._id,
+    {isPinned},
+    {
+      headers: {
+        Authorization: `Bearer ${userData.accessToken}`,
+      },
+    },
+  );
+  try {
+    if (data) {
+      if (data.status == 'ok') {
+        ToastAndroid.show(data.message, ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show(data.message, ToastAndroid.SHORT);
+      }
+    }
+  } catch (error) {
+    ToastAndroid.show('Pin song failed', ToastAndroid.SHORT);
+  }
+};
+export const deleteSong = async id => {
+  const catchData = await AsyncStorage.getItem('chordlyrics_userData');
+  const userData = catchData ? JSON.parse(catchData) : false;
+
+  const {data} = await axios.delete(
+    Base_Url + '/song/delete/' + id + '?userId=' + userData._id,
+    {
+      headers: {
+        Authorization: `Bearer ${userData.accessToken}`,
+      },
+    },
+  );
+  try {
+    if (data) {
+      if (data.status == 'ok') {
+        ToastAndroid.show(data.message, ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show(data.message, ToastAndroid.SHORT);
+      }
+    }
+  } catch (error) {
+    ToastAndroid.show('Delete song failed', ToastAndroid.SHORT);
+  }
+};
 
 const storeDataLocally = async data => {
   try {
@@ -295,6 +380,7 @@ const storeDataLocally = async data => {
 const retrieveDataLocally = async () => {
   try {
     const data = await AsyncStorage.getItem('chordlyrics_localData');
+
     return data ? JSON.parse(data) : null;
   } catch (error) {
     console.error('Error retrieving data from local storage:', error);
@@ -341,7 +427,7 @@ const retrieveFilterDatasLocally = async (key, value) => {
     if (data && data.length > 0) {
       const allSongs = JSON.parse(data);
       if (key == 'keyboard') {
-        const song = allSongs.map(i => i.keyboardModal);
+        const song = [...new Set(allSongs.map(i => i.keyboardModal))];
         return song;
       } else if (key == 'language') {
         const song = [

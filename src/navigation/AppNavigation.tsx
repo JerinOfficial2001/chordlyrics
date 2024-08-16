@@ -19,6 +19,7 @@ import Auth from '../screens/Auth';
 import {useGlobalContext} from '../utils/isAuthenticated';
 import AddDataModal from '../components/Modals/AddDataModal';
 import AddSong from '../screens/AddSong';
+import DeleteModal from '../components/Modals/DeleteModal';
 
 type RootStackParamList = {
   Home: undefined;
@@ -34,8 +35,9 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
   const [isOpen, setisOpen] = useState(false);
-  const {showFloatButton, currentRoute, cachedData} = useGlobalContext();
-
+  const {showFloatButton, currentRoute, cachedData, deleteSongFunctions} =
+    useGlobalContext();
+  const {handleDelete, handleDismiss, openDeleteModal} = deleteSongFunctions;
   const styles = StyleSheet.create({
     FloatableButton: {
       borderRadius: 50,
@@ -132,6 +134,14 @@ const AppNavigator: React.FC = () => {
         isVisible={isOpen}
         handleDismiss={handleClose}
       />
+      {deleteSongFunctions && (
+        <DeleteModal
+          handleDismiss={handleDismiss}
+          isVisible={openDeleteModal != ''}
+          handleDelete={handleDelete}
+          id={openDeleteModal}
+        />
+      )}
     </NavigationContainer>
   );
 };

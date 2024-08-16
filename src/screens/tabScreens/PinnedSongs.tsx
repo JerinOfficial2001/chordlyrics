@@ -31,7 +31,7 @@ const PinnedSongs = ({props}: any) => {
     <SurfaceLayout>
       {isLoading ? (
         <Loader />
-      ) : MySongs.length > 0 ? (
+      ) : MySongs?.length > 0 ? (
         <FlatList
           data={MySongs}
           keyExtractor={key => key._id}

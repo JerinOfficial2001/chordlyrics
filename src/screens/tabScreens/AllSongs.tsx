@@ -7,11 +7,13 @@ import {useQuery} from '@tanstack/react-query';
 import Loader from '../../components/Loader';
 import SongCard from '../../components/SongCard';
 import {getAllSongs} from '../../controllers/songs';
+import {ActivityIndicator, Portal} from 'react-native-paper';
 
 type Props = {};
 
 const AllSongs = ({props}: any) => {
-  const {setcurrentRoute, cachedData} = useGlobalContext();
+  const {setcurrentRoute, cachedData, deleteSongFunctions} = useGlobalContext();
+  const {handleOpenDeleteModal, deletionLoading} = deleteSongFunctions;
   const {
     data: AllSongs,
     isLoading,
@@ -31,9 +33,25 @@ const AllSongs = ({props}: any) => {
 
   return (
     <SurfaceLayout>
+      {deletionLoading && (
+        <Portal>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#00000087',
+              flexDirection: 'column',
+              gap: 5,
+            }}>
+            <ActivityIndicator color="#3683AF" size={'large'} />
+            <Text style={{marginLeft: 10}}>Deleting...</Text>
+          </View>
+        </Portal>
+      )}
       {isLoading ? (
         <Loader />
-      ) : AllSongs.length > 0 ? (
+      ) : AllSongs?.length > 0 ? (
         <FlatList
           data={AllSongs}
           keyExtractor={key => key._id}
@@ -58,6 +76,7 @@ const AllSongs = ({props}: any) => {
                     data: item,
                   })
                 }
+                onPressDelete={() => handleOpenDeleteModal(item._id)}
                 isAdmin={
                   cachedData &&
                   (cachedData.role == 'admin' || cachedData.role == 'ADMIN')
